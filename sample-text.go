@@ -1,6 +1,19 @@
 package main
 
-var jsonText = `
+var sample = `
+{
+	"project": "90368",
+	"logger": "javascript",
+	"platform": "javascript",
+	"request": {
+	"user_agent": "Foobar",
+	"referer": "https://cixtor.com/"
+	},
+	"release": "v3-1633-gbb54e4ad",
+	"event_id": "b0cfac40a3374cc686b1"
+}`
+
+var github = `
 {
 	"id": 1296269,
 	"array1": ["hello", "cat"],
@@ -209,7 +222,7 @@ var smartyStreets = `
 			"delivery_point": "01",
 			"delivery_point_check_digit": "3"
 		},
-		"metadata": {
+		"metadata": [{
 			"record_type": "S",
 			"zip_type": "Standard",
 			"county_fips": "24510",
@@ -225,7 +238,23 @@ var smartyStreets = `
 			"time_zone": "Eastern",
 			"utc_offset": -5,
 			"dst": true
-		},
+		},{
+			"record_type": "S",
+			"zip_type": "Standard",
+			"county_fips": "24510",
+			"county_name": "Baltimore City",
+			"carrier_route": "C047",
+			"congressional_district": "07",
+			"rdi": "Residential",
+			"elot_sequence": "0059",
+			"elot_sort": "A",
+			"latitude": 39.28602,
+			"longitude": -76.6689,
+			"precision": "Zip9",
+			"time_zone": "Eastern",
+			"utc_offset": -5,
+			"dst": true
+		}],
 		"analysis": {
 			"dpv_match_code": "Y",
 			"dpv_footnotes": "AABB",
@@ -252,7 +281,7 @@ var smartyStreets = `
 			"delivery_point": "01",
 			"delivery_point_check_digit": "1"
 		},
-		"metadata": {
+		"metadata": [{
 			"record_type": "S",
 			"zip_type": "Standard",
 			"county_fips": "24510",
@@ -268,7 +297,23 @@ var smartyStreets = `
 			"time_zone": "Eastern",
 			"utc_offset": -5,
 			"dst": true
-		},
+		},{
+			"record_type": "S",
+			"zip_type": "Standard",
+			"county_fips": "24510",
+			"county_name": "Baltimore City",
+			"carrier_route": "C047",
+			"congressional_district": "07",
+			"rdi": "Residential",
+			"elot_sequence": "0064",
+			"elot_sort": "A",
+			"latitude": 39.2858,
+			"longitude": -76.66889,
+			"precision": "Zip9",
+			"time_zone": "Eastern",
+			"utc_offset": -5,
+			"dst": true
+		}]
 		"analysis": {
 			"dpv_match_code": "Y",
 			"dpv_footnotes": "AABB",

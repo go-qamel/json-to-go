@@ -1,9 +1,10 @@
-package main
+package converter
 
 import (
 	"bytes"
 	"fmt"
 	"go/format"
+	"strings"
 
 	"github.com/buger/jsonparser"
 )
@@ -25,6 +26,11 @@ func (cv Converter) Convert(jsonValue string) (string, error) {
 		generatedName = GeneratedName
 	}
 
+	// Prepare container for nested structs
+	nsContainer := nestedStruct{
+		Map: make(map[string]struct{}),
+	}
+
 	// Parse JSON value
 	value, dataType, _, err := jsonparser.Get([]byte(jsonValue))
 	if err != nil {
@@ -42,10 +48,10 @@ func (cv Converter) Convert(jsonValue string) (string, error) {
 		numberType := cv.getNumberType(value)
 		result = "type " + generatedName + " " + numberType
 	case jsonparser.Array:
-		arrayType := cv.getArrayType("", value)
+		arrayType := cv.getArrayType("", value, &nsContainer)
 		result = "type " + generatedName + " " + arrayType
 	case jsonparser.Object:
-		structDecl, err := cv.createStruct(value)
+		structDecl, err := cv.createStruct(value, &nsContainer)
 		if err != nil {
 			return "", fmt.Errorf("failed to create struct: %w", err)
 		}
@@ -54,16 +60,20 @@ func (cv Converter) Convert(jsonValue string) (string, error) {
 		return "type " + generatedName + " interface{}", nil
 	}
 
+	// If there are nested structs, add them to code
+	nestedStructs := strings.Join(nsContainer.List, "\n\n")
+	result += "\n\n" + nestedStructs
+
 	// Format the result
 	result, err = cv.formatCode(result)
 	if err != nil {
 		return "", fmt.Errorf("failed to format output: %w", err)
 	}
 
-	return result, nil
+	return strings.TrimSpace(result), nil
 }
 
-func (cv Converter) createStruct(data []byte) (string, error) {
+func (cv Converter) createStruct(data []byte, nsContainer *nestedStruct) (string, error) {
 	result := "struct {\n"
 	handler := func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
 		// Convert key to camel case
@@ -80,18 +90,20 @@ func (cv Converter) createStruct(data []byte) (string, error) {
 		case jsonparser.Number:
 			fieldType = cv.getNumberType(value)
 		case jsonparser.Array:
-			fieldType = cv.getArrayType(fieldName, value)
+			fieldType = cv.getArrayType(fieldName, value, nsContainer)
 		case jsonparser.Boolean:
 			fieldType = "bool"
 		case jsonparser.Object:
-			if !cv.InlineStruct {
-				fieldType = fieldName
-			} else {
-				structDecl, err := cv.createStruct(value)
-				if err != nil {
-					return fmt.Errorf("failed to parse %s: %w", jsonName, err)
-				}
+			structDecl, err := cv.createStruct(value, nsContainer)
+			if err != nil {
+				return fmt.Errorf("failed to parse %s: %w", jsonName, err)
+			}
+
+			if cv.InlineStruct {
 				fieldType = structDecl
+			} else {
+				fieldType = fieldName
+				nsContainer.add("type " + fieldName + " " + structDecl)
 			}
 		}
 
@@ -116,7 +128,7 @@ func (cv Converter) getNumberType(value []byte) string {
 	return "int"
 }
 
-func (cv Converter) getArrayType(name string, value []byte) string {
+func (cv Converter) getArrayType(name string, value []byte, nsContainer *nestedStruct) string {
 	// Get all type in this array
 	mapType := make(map[string]struct{})
 	handler := func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
@@ -129,19 +141,21 @@ func (cv Converter) getArrayType(name string, value []byte) string {
 			numberType := cv.getNumberType(value)
 			mapType[numberType] = struct{}{}
 		case jsonparser.Array:
-			arrayType := cv.getArrayType(name, value)
+			arrayType := cv.getArrayType(name, value, nsContainer)
 			mapType[arrayType] = struct{}{}
 		case jsonparser.Boolean:
 			mapType["bool"] = struct{}{}
 		case jsonparser.Object:
+			structDecl, err1 := cv.createStruct(value, nsContainer)
+			if err1 != nil {
+				err = err1
+				return
+			}
+
 			if !cv.InlineStruct && name != "" {
 				mapType[name] = struct{}{}
+				nsContainer.add("type " + name + " " + structDecl)
 			} else {
-				structDecl, err1 := cv.createStruct(value)
-				if err1 != nil {
-					err = err1
-				}
-
 				mapType[structDecl] = struct{}{}
 			}
 		}

@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+
+	"json-2-go/converter"
 )
 
 func main() {
-	cv := Converter{InlineStruct: false}
-	res, err := cv.Convert(smartyStreets)
+	cv := converter.Converter{InlineStruct: true}
+	res, err := cv.Convert(sample)
 	if err != nil {
 		log.Fatalln(err)
 	}
