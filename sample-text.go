@@ -52,11 +52,15 @@ var jsonText = `
 	"pushed_at": "2011-01-26T19:06:43Z",
 	"created_at": "2011-01-26T19:01:12Z",
 	"updated_at": "2011-01-26T19:14:43Z",
-	"permissions": {
+	"permissions": [{
 		"admin": false,
 		"push": false,
 		"pull": true
-	},
+	},{
+		"admin": false,
+		"push": false,
+		"pull": true
+	}],
 	"subscribers_count": 42,
 	"organization": {
 		"login": "octocat",
