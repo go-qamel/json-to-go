@@ -34,7 +34,7 @@ func (cv Converter) Convert(jsonValue string) (string, error) {
 	// Parse JSON value
 	value, dataType, _, err := jsonparser.Get([]byte(jsonValue))
 	if err != nil {
-		return "", fmt.Errorf("failed to parse json: %w", err)
+		return "", err
 	}
 
 	// Convert value depending on type
@@ -53,7 +53,7 @@ func (cv Converter) Convert(jsonValue string) (string, error) {
 	case jsonparser.Object:
 		structDecl, err := cv.createStruct(value, &nsContainer)
 		if err != nil {
-			return "", fmt.Errorf("failed to create struct: %w", err)
+			return "", err
 		}
 		result = "type " + generatedName + " " + structDecl
 	default:
@@ -67,7 +67,7 @@ func (cv Converter) Convert(jsonValue string) (string, error) {
 	// Format the result
 	result, err = cv.formatCode(result)
 	if err != nil {
-		return "", fmt.Errorf("failed to format output: %w", err)
+		return "", err
 	}
 
 	return strings.TrimSpace(result), nil
