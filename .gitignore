@@ -1,2 +1,22 @@
-/.idea
-/json-to-go
+# Exclude config file
+.vscode/
+.idea/
+
+# Exclude Qt file
+deploy/
+qamel-*
+moc-*
+*.qmlc
+*.jsc
+*_plugin_import.cpp
+
+# Exclude generated file
+*.syso
+*.log
+*.exe
+/.qamel-cache
+json-to-go
+json-to-go-dev
+
+# Exclude vendor for Go mod
+/vendor
