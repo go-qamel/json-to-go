@@ -1,4 +1,4 @@
-module json-2-go
+module json-to-go
 
 go 1.13
 
