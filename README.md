@@ -1,9 +1,9 @@
 JSON to Go
 ---
 
-The port of a web app with same name, intended as demo for [`qamel`](https://github.com/go-qamel/qamel). Using this app, you can  instantly converts JSON into a Go type definition. You can download the pre-compiled binary in [release](https://github.com/go-qamel/json-to-go/releases) page.
+The port of a [web app](https://mholt.github.io/json-to-go/) that created by [@mholt](https://github.com/mholt) with same name, intended as demo for [`qamel`](https://github.com/go-qamel/qamel). Using this app, you can  instantly converts JSON into a Go type definition. You can download the pre-compiled binary in [release](https://github.com/go-qamel/json-to-go/releases) page.
 
-![Screenshot](https://raw.githubusercontent.com/RadhiFadlillah/json-to-go/master/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/go-qamel/json-to-go/master/screenshot.png)
 
 ### How to Build
 
