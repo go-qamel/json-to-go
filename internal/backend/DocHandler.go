@@ -3,6 +3,7 @@ package backend
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"json-to-go/internal/converter"
 
@@ -53,40 +54,22 @@ func (b *DocHandler) convert(jsonValue string, inlineStruct bool) {
 func highlightGoCode(code string) (string, error) {
 	lexer := lexers.Get("go")
 	style := styles.Get("dracula")
-	formatter := html.New(html.WithClasses(true))
+	formatter := html.New(html.PreventSurroundingPre(true))
 
 	iterator, err := lexer.Tokenise(nil, code)
 	if err != nil {
 		return "", fmt.Errorf("failed to tokenise code: %v", err)
 	}
 
-	var htmlBuffer bytes.Buffer
-	err = formatter.Format(&htmlBuffer, style, iterator)
+	var buffer bytes.Buffer
+	err = formatter.Format(&buffer, style, iterator)
 	if err != nil {
 		return "", fmt.Errorf("failed to highlight code: %v", err)
 	}
 
-	var cssBuffer bytes.Buffer
-	err = formatter.WriteCSS(&cssBuffer, style)
-	if err != nil {
-		return "", fmt.Errorf("failed to generate css: %v", err)
-	}
+	htmlContent := `<meta name="qrichtext" content="1">`
+	htmlContent += buffer.String()
+	htmlContent = strings.ReplaceAll(htmlContent, "\n", "\n<br>")
 
-	htmlContent := htmlBuffer.String()
-	cssContent := cssBuffer.String()
-
-	htmlPage := `
-	<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<style type="text/css">
-			p, body { font-size: 10pt }` + "\n" + cssContent + "\n" + `
-		</style>
-	</head>
-	<body class="chroma">` +
-		htmlContent + `
-	</body>
-	</html>`
-
-	return htmlPage, nil
+	return htmlContent, nil
 }
